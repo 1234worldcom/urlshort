@@ -6,9 +6,14 @@ const http = require('http');
 const socketIo = require('socket.io');
 const fs = require('fs');
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo();
+const cors = require('cors');
 
+
+const corsOptions = {
+    origin: 'http://127.0.0.1:5501', // Specify the allowed origin
+    credentials: true, // Indicate that cookies should be included in cross-site requests
+};
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -16,6 +21,8 @@ app.use(express.static('public'));
 
 const urlDatabase = {};
 let idCounter = 1;
+
+
 
 // Function to generate a 5-letter encoded short URL
 function generateShortUrl() {
@@ -293,7 +300,4 @@ app.get('/api/urllist-data', (req, res) => {
 });
 
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+
