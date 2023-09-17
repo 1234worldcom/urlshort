@@ -28,53 +28,59 @@ document.addEventListener('DOMContentLoaded', () => {
       const originalUrl = document.getElementById('originalUrl').value;
       const customShortUrl = document.getElementById('customShortUrl').value;
 
-      try {
-        // Send a POST request to your server to shorten the URL
-        const response = await fetch('/api/shorten', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            originalUrl,
-            customShortUrl,
-          }),
-        });
+      const apiUrl = 'http://localhost:3000/api/shorten'; // Define your API URL here
+    const originalUrl = document.getElementById('originalUrl').value;
+    const customShortUrl = document.getElementById('customShortUrl').value;
 
-        const data = await response.json();
+    try {
+      // Send a POST request to your server to shorten the URL
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        mode: 'cors', // Set the mode to 'cors' to handle CORS
+        headers: {
+          'Content-Type': 'application/json',
+          'Origin': 'http://127.0.0.1:5501' // Specify your origin here
+        },
+        body: JSON.stringify({
+          originalUrl,
+          customShortUrl,
+        }),
+      });[]
 
-        if (response.ok) {
-          // Store login status in local storage
-          localStorage.setItem('isLoggedIn', 'true');
+      const data = await response.json();
 
-          shortenedUrlElement.textContent = `Shortened URL: ${data.shortenedUrl}`;
-          errorMessageElement.textContent = '';
+      if (response.ok) {
+        // Store login status in local storage
+        localStorage.setItem('isLoggedIn', 'true');
 
-          // Handle the QR code URL from the server response
-          let qrCodeUrl = data.shortenedUrl;
+        shortenedUrlElement.textContent = `Shortened URL: ${data.shortenedUrl}`;
+        errorMessageElement.textContent = '';
 
-          if (qrCodeUrl && qrCodeUrl !== 'None') {
-            if (!qrCodeUrl.startsWith('http://') && !qrCodeUrl.startsWith('https://')) {
-              qrCodeUrl = `http://${qrCodeUrl}`;
-            }
+        // Handle the QR code URL from the server response
+        let qrCodeUrl = '' + data.shortenedUrl;
 
-            const qrCodeImageUrl = `${qrCodeUrl}/qrcode`;
-
-            qrCodeImage.src = qrCodeImageUrl;
-          } else {
-            qrCodeImage.src = '';
+        if (qrCodeUrl && qrCodeUrl !== 'None') {
+          if (!qrCodeUrl.startsWith('http://') && !qrCodeUrl.startsWith('http://')) {
+            qrCodeUrl = `http://${qrCodeUrl}`;
           }
+
+          const qrCodeImageUrl = `${qrCodeUrl}/qrcode`;
+
+          qrCodeImage.src = qrCodeImageUrl;
         } else {
-          errorMessageElement.textContent = data.error || 'An error occurred.';
-          shortenedUrlElement.textContent = '';
           qrCodeImage.src = '';
         }
-      } catch (error) {
-        errorMessageElement.textContent = 'An error occurred. Please try again later.';
+      } else {
+        errorMessageElement.textContent = data.error || 'An error occurred.';
         shortenedUrlElement.textContent = '';
         qrCodeImage.src = '';
       }
-    });
+    } catch (error) {
+      errorMessageElement.textContent = 'An error occurred. Please try again later.';
+      shortenedUrlElement.textContent = '';
+      qrCodeImage.src = '';
+    }
+  });
 
     // Add event listener for the login button (you should customize this logic)
     loginButton.addEventListener('click', () => {
